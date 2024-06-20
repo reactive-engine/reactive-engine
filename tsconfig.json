@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "target": "ES6",
+    "module": "ES2015",
+    "moduleResolution": "Node",
+    "allowJs": false,
+    "strict": true,
+    "noUnusedLocals": false,
+    "experimentalDecorators": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "removeComments": false,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "allowUnusedLabels": true,
+    "jsx": "preserve",
+    "lib": [
+      "ESNext",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "typeRoots": [
+      "node_modules/@types",
+      "vite/client" 
+    ],
+  } 
+}

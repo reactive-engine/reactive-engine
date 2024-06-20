@@ -1,7 +1,4 @@
-# Reactive Engine
-
-Version 1.0.0
-
+# Reactive Engine 
 Licensed under the MIT license
 
 ## Overview 

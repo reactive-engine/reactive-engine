@@ -1,0 +1,28 @@
+{
+    "name": "reactive_examples",
+    "version": "1.0.0",
+    "description": "",
+    "private": "false",
+    "type": "module",
+    "main": "./dist/index.js",
+    "module": "./dist/index.js",
+    "exports": {
+        ".": {
+            "import": {
+                "types": "./dist/index.d.ts",
+                "default": "./dist/index.esm.js"
+            },
+            "require": {
+                "types": "./dist/index.d.ts",
+                "default": "./dist/index.umd.js"
+            }
+        }
+    },
+    "scripts": {
+        "demo": "vite dev"
+    },
+    "keywords": [],
+    "author": "Ekrem Erşahin",
+    "license": "MIT",
+    "types": "./dist/index.d.ts"
+}
