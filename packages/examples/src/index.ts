@@ -1,7 +1,9 @@
 import { Reactive } from "reactive-engine";
+import { bindElement } from "./BasicBinding";
+import { bindModel } from "./TwoWayModelBinding";
 var reactive = new Reactive();
 let model = reactive.observe({
-    intValue: 110,
+    intValue: 1,
     stringValue: 'Item',
     dateValue: new Date(),
     objectValue: {
@@ -92,3 +94,9 @@ reactive.watch(() => {
     map_table.innerHTML = str;
 
 })
+
+
+var autoBind = document.getElementById('autobind');
+var select_input = document.getElementById("select_input") as HTMLSelectElement;
+bindModel(select_input, model, 'stringValue');
+autoBind && bindElement(autoBind, 'innerHTML', model, 'stringValue');
