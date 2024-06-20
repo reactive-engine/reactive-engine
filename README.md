@@ -1,8 +1,7 @@
-# Reactive Engine
-
-Version 1.0.0
-
+# Reactive Engine 
 Licensed under the MIT license
+
+#  [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/reactive-engine/reactive-engine) [![npm version](https://img.shields.io/npm/v/reactive-engine.svg?style=flat)](https://www.npmjs.com/package/reactive-engine)
 
 ## Overview 
 

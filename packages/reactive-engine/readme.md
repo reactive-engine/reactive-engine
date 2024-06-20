@@ -1,6 +1,8 @@
 # Reactive Engine 
 Licensed under the MIT license
 
+#  [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/reactive-engine/reactive-engine) [![npm version](https://img.shields.io/npm/v/reactive-engine.svg?style=flat)](https://www.npmjs.com/package/reactive-engine)
+
 ## Overview 
 
 Reactive-Engine is a library designed to track changes made to an object and its nested properties using ES6 Proxies. It aims to be highly performant and  practical.
