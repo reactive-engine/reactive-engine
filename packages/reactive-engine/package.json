@@ -1,6 +1,6 @@
 {
     "name": "reactive-engine",
-    "version": "1.0.2",
+    "version": "1.0.4",
     "description": "Javascript Reactive Engine",
     "type": "module",
     "main": "./dist/index.js",
