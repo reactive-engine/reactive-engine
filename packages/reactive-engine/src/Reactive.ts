@@ -124,7 +124,7 @@ export class Reactive implements IReactive {
                 this.cacheFx.set(effect, e.key as any);
                 const adddepends = (de) => {
                     [...de.depends].filter(x => !this.cacheFx.has(x)).forEach(depEffect => {
-                        if (!this.cacheFx.has(depEffect)) {
+                        if (this.cacheFx && !this.cacheFx.has(depEffect)) {
                             this.cacheFx.set(depEffect, e.key as any);
                         }
                         adddepends(depEffect);
@@ -136,12 +136,12 @@ export class Reactive implements IReactive {
         clearTimeout(this.cacheTimer)
         this.cacheTimer = setTimeout(() => {
             Promise.resolve().then(() => {
-                this.cacheFx.forEach((v, k) => {
+                this && this.cacheFx && this.cacheFx.forEach((v, k) => {
                     if (k.binder && !k.binder.disposed) {
                         this.triggerEffect(k, e);
                     }
                 })
-                this.cacheFx.clear();
+                this && this.cacheFx && this.cacheFx.clear();
             });
         }, 0)
     }

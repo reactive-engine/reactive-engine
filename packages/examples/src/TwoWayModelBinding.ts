@@ -1,4 +1,4 @@
-import { CheckType, DefaultStoreBindingSettings, DefaultStoreMapper, DirectiveBindingType, IBindingSettingsBase, IStoreBinder, IStoreBindingSettings, IStoreMapper } from "reactive-engine";
+import { DefaultStoreMapper, IBindingSettingsBase, IStoreBinder } from "reactive-engine";
 
 export class TWBindingSettings implements IBindingSettingsBase<HTMLInputElement | HTMLSelectElement> {
     Property: object;
@@ -18,7 +18,7 @@ export class TwoWayModelBinding implements IStoreBinder<HTMLInputElement | HTMLS
     oldvalue: any;
     setupCompleted: boolean = false;
     public bind: { get: () => any, set: (val) => void } | null = null
-    storeMapper: IStoreMapper;
+    storeMapper: DefaultStoreMapper;
     isFirstCall: boolean = true;
     constructor() {
         this.storeMapper = new DefaultStoreMapper();
@@ -113,46 +113,6 @@ export class TwoWayModelBinding implements IStoreBinder<HTMLInputElement | HTMLS
                 break;
         }
         this.setupCompleted = true;
-
-    }
-
-    update() {
-
-        if (this.settings == null) { return }
-
-        var nv = this.settings.Property[this.settings.FieldName];
-        if (nv === undefined || nv === null) {
-            if (typeof nv === 'number') { nv = 0; }
-        }
-
-        switch ((this.settings.owner as HTMLElement).tagName) {
-            case 'input': case 'INPUT':
-                var ii = (this.settings.owner as unknown as HTMLInputElement);
-                if (ii.type == 'checkbox' || ii.type == 'radio') {
-                    if (typeof this.settings.Property[this.settings.FieldName] === 'boolean') {
-                        (this.settings.owner as unknown as HTMLInputElement).checked = nv;
-                    } else {
-                        (this.settings.owner as unknown as HTMLInputElement).checked = false;
-                        (this.settings.owner as unknown as HTMLInputElement).value = nv;
-                    }
-                } else {
-                    (this.settings.owner as unknown as HTMLInputElement).value = nv;
-                }
-                break;
-            case 'button': case 'BUTTON':
-                var se = <any>this.settings.owner;
-                se.value = nv;
-                break;
-            case 'select': case 'SELECT':
-                (this.settings.owner as unknown as HTMLSelectElement).value = nv;
-                break;
-            case 'option': case 'OPTION':
-                (this.settings.owner as unknown as HTMLOptionElement).value = nv;
-                break;
-            default:
-                (this.settings.owner as any).value = nv;
-                break;
-        }
     }
     init(settings: TWBindingSettings): void {
 
