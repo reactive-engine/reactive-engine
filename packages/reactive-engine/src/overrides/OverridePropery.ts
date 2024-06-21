@@ -8,13 +8,13 @@ export class OverridePropery {
         if (typeof prop != 'object') {
             return prop;
         }
-        var oldDescriptor = Reflect.getOwnPropertyDescriptor(prop, name);
+        const oldDescriptor = Reflect.getOwnPropertyDescriptor(prop, name);
         if (oldDescriptor && typeof oldDescriptor.get == 'function' && oldDescriptor.configurable) {
             return;
         }
         const unique = Symbol();
-        var originalValue = engine.observe(prop[name], { data: prop, key: name });
-        Reflect.defineProperty(prop, name, { 
+        let originalValue = engine.observe(prop[name], { data: prop, key: name });
+        Reflect.defineProperty(prop, name, {
             get() {
                 if (oldDescriptor?.get) {
                     return oldDescriptor.get.call(prop);
@@ -24,7 +24,7 @@ export class OverridePropery {
             },
             set(v) {
                 if (originalValue != v) {
-                    var oldData = originalValue;
+                    const oldData = originalValue;
                     if (oldDescriptor?.set) {
                         oldDescriptor.set.call(prop, v);
                     }

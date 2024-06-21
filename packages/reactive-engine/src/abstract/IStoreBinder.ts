@@ -2,12 +2,12 @@ import { defaults } from "../common";
 export type DirectiveBindingType = "function" | "expression" | 'model';
 
 export function CheckType(_settings: IStoreBindingSettings<any>) {
-    var val: any;
+    let val: any;
     switch (_settings.type) {
         case "expression":
             if (_settings.Property && _settings.FieldName) {
                 _settings.callback = () => {
-                    var val = (_settings.Property as any)[_settings.FieldName];
+                    val = (_settings.Property as any)[_settings.FieldName];
                     return val;
                 }
                 val = _settings.callback();
@@ -98,7 +98,7 @@ export class DefaultStoreMapper implements IStoreMapper {
     run(): void {
         const self = this;
         if (this.binder) {
-            var result;
+            let result;
             this.parent = defaults.current;
             defaults.current = self;
             result = this.binder.run();
@@ -130,7 +130,7 @@ export class DefaultStoreMapper implements IStoreMapper {
                 }
             })
 
-            var existModels = em.targetMap.get(this.binder.settings?.Property);
+            const existModels = em.targetMap.get(this.binder.settings?.Property);
             if (existModels && existModels.has(this.binder.settings?.FieldName)) {
                 existModels.get(this.binder.settings?.FieldName)?.delete(this);
                 if (existModels.get(this.binder.settings?.FieldName)?.size == 0) {
@@ -146,8 +146,15 @@ export class DefaultStoreMapper implements IStoreMapper {
         })
         this.disposed = true;
         this.parents.delete(this);
+        this.parents = null as any;
         this.depends.clear();
+        this.depends = null as any;
         this.parent = null;
+        this.models = null as any;
+        this.binder = null as any;
+        this.activeKey = null;
+        this.activeModel = null;
+        this.id = null as any;
     }
     ondisposing?: (() => void) | undefined;
     depends: Set<IStoreMapper> = new Set();
@@ -188,5 +195,9 @@ export class EffectStoreBinder implements IStoreBinder<any> {
     dispose(): void {
         this.storeMapper.dispose();
         this.disposed = true;
+        this.settings = null;
+        this.oldvalue = null;
+        this.storeMapper = null as any;
+        this.isFirstCall = null as any;
     }
 } 

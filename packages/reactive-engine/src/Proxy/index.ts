@@ -3,13 +3,22 @@ import { Flags, IReactive, TargetType, builtInSymbols, getTargetType, isNonTrack
 export const ProxyMap = new WeakMap<any, any>();
 
 export class Proxyable {
-
+    /**
+     *
+     */
+    constructor() {
+        this.setHandler = this.setHandler.bind(this);
+        this.createGetter = this.createGetter.bind(this);
+        this.createSetter = this.createSetter.bind(this);
+        this.ProxyHandler = this.ProxyHandler.bind(this);
+        this.Generate = this.Generate.bind(this); 
+    }
     private setHandler(target, p, engine: IReactive, parent) {
 
         if (engine['disposed']) {
             return;
         }
-        var raw = toRaw(target);
+        const raw = toRaw(target);
         if (typeof raw[p] !== 'function') {
             engine && engine.overrides && engine.overrides.property.create(raw, p, engine);
         }
@@ -28,7 +37,7 @@ export class Proxyable {
 
     }
     private createGetter(engine, parent) {
-        var self = this;
+        const self = this;
         return function (target, p, receiver) {
             if (Flags.Raw === p) {
                 return target;
@@ -53,7 +62,7 @@ export class Proxyable {
         }
     }
     private createSetter(engine, parent) {
-        var self = this;
+        const self = this;
         return function (target, p, newValue, receiver) {
             if (isSymbol(p) ? !builtInSymbols.has(p) : !isNonTrackableKeys(p as string)) {
                 if (engine['disposed'] != true) {
@@ -107,18 +116,11 @@ export class Proxyable {
     }
     public Generate<T extends Object>(data: T, engine: IReactive, parent): T {
 
-        var that = this;
         if (!isObject(data)) {
             return data
         }
         if (isReactive(data)) {
             return data;
-        }
-
-        var proto = Object.getPrototypeOf(data);
-        var cname = "";
-        if (proto && proto.constructor) {
-            cname = proto.constructor.name;
         }
 
 
@@ -131,7 +133,7 @@ export class Proxyable {
             return existingProxy as any
         }
 
-        var proxy = this.ProxyHandler(data, engine, parent);
+        const proxy = this.ProxyHandler(data, engine, parent);
         ProxyMap.set(proxy, data);
 
         return proxy;

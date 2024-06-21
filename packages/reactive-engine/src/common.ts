@@ -65,19 +65,14 @@ export function mapCreator(str: string, expectsLowerCase?: boolean): (key: strin
 export const isNonTrackableKeys = mapCreator(`__proto__`)
 
 export function getTargetType(value: any): TargetType {
-    var isSys = false;
-    var proto = Object.getPrototypeOf(value);
-    var cname = "";
+
+    const proto = Object.getPrototypeOf(value);
+    let cname = "";
     if (proto && proto.constructor) {
         cname = proto.constructor.name;
     }
-    var isSystem = false;
+    let isSystem = false;
     defaults.SystemTypes?.forEach(x => {
-        var protos = Object.getPrototypeOf(x);
-        var cnamex = "";
-        if (protos && protos.constructor) {
-            cnamex = protos.constructor.name;
-        }
         try {
             if (typeof value == 'object' && value instanceof x) {
                 isSystem = true;
@@ -163,7 +158,7 @@ export function def(prop, key, value) {
 }
 
 export function hasDescVal(prop, name) {
-    var oldDescriptor = Reflect.getOwnPropertyDescriptor(prop, name);
+    const oldDescriptor = Reflect.getOwnPropertyDescriptor(prop, name);
     if (oldDescriptor && typeof oldDescriptor.value == 'function') {
         return true;
     }

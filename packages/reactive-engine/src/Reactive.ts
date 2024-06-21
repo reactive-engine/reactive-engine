@@ -12,14 +12,31 @@ export class Reactive implements IReactive {
         if (!defaults.engineMaps.has(this)) {
             defaults.engineMaps.add(this);
         }
+        this.onReset = this.onReset.bind(this);
+        this.watch = this.watch.bind(this);
+        this.onDelete = this.onDelete.bind(this);
+        this.onInsert = this.onInsert.bind(this);
+        this.onUpdate = this.onUpdate.bind(this);
+        this.observe = this.observe.bind(this);
+        this.onChanged = this.onChanged.bind(this);
+        this.onChanging = this.onChanging.bind(this);
+        this.onTrigger = this.onTrigger.bind(this);
+        this.adddepends = this.adddepends.bind(this);
+        this.triggerEffects = this.triggerEffects.bind(this);
+        this.triggerEffect = this.triggerEffect.bind(this);
+        this.onTrack = this.onTrack.bind(this);
+        this.trackComplete = this.trackComplete.bind(this);
+        this.clearModel = this.clearModel.bind(this);
+        this.clearModelAll = this.clearModelAll.bind(this);
+        this.dispose = this.dispose.bind(this); 
     }
 
     watch(callback: () => void);
     watch<DT, KT extends keyof DT>(prop: DT, key: KT, callback: (data: DT[KT] extends (infer U)[] ? U : DT[KT] extends infer U ? U : any) => void): void;
     watch(prop: unknown, key?: unknown, callback?: unknown): any {
 
-        var binder = new EffectStoreBinder();
-        var s = new DefaultStoreBindingSettings();
+        const binder = new EffectStoreBinder();
+        const s = new DefaultStoreBindingSettings();
         if (arguments.length == 1) {
             s.callback = arguments[0];
             s.type = 'function';
@@ -79,7 +96,7 @@ export class Reactive implements IReactive {
         } else if (t.ReactiveState == 'notset') {
             t.ReactiveState = 'root';
         }
-        var l = t._model.push(defaultProxyable.Generate<T>(data, t, parent));
+        const l = t._model.push(defaultProxyable.Generate<T>(data, t, parent));
         return t._model[l - 1];
     }
     onChanged(sender: IReactive, e: onChangedEventArgs) {
@@ -91,8 +108,8 @@ export class Reactive implements IReactive {
     onTrigger(sender: IReactive, e: onTriggerEventArgs) {
         if (this.disposed) { return; }
         const effects: IStoreMapper[] = [];
-        var items = this.targetMap.get(e.prop)?.get(e.key);
-        var exist = this.targetMap.get(e.prop);
+        const items = this.targetMap.get(e.prop)?.get(e.key);
+        const exist = this.targetMap.get(e.prop);
         if (exist) {
             if (Array.isArray(e.prop)) {
                 if (exist) {
@@ -114,23 +131,23 @@ export class Reactive implements IReactive {
         }
     }
     cacheFx = new Map<IStoreMapper, Set<any>>();
-    cacheTimer;
+    cacheTimer = null as any;
+
+    adddepends = (de,e) => {
+        [...de.depends].filter(x => !this.cacheFx.has(x)).forEach(depEffect => {
+            if (this.cacheFx && !this.cacheFx.has(depEffect)) {
+                this.cacheFx.set(depEffect, e.key as any);
+            }
+            this.adddepends(depEffect,e);
+        })
+    }
 
     triggerEffects(dep: IStoreMapper[], e: onTriggerEventArgs) {
         const effects = Array.isArray(dep) ? dep : [...dep]
-        for (const effect of effects) {
-
+        for (const effect of effects) { 
             if (!this.cacheFx.has(effect)) {
-                this.cacheFx.set(effect, e.key as any);
-                const adddepends = (de) => {
-                    [...de.depends].filter(x => !this.cacheFx.has(x)).forEach(depEffect => {
-                        if (this.cacheFx && !this.cacheFx.has(depEffect)) {
-                            this.cacheFx.set(depEffect, e.key as any);
-                        }
-                        adddepends(depEffect);
-                    })
-                }
-                adddepends(effect);
+                this.cacheFx.set(effect, e.key as any); 
+                this.adddepends(effect,e);
             }
         }
         clearTimeout(this.cacheTimer)
@@ -142,12 +159,13 @@ export class Reactive implements IReactive {
                     }
                 })
                 this && this.cacheFx && this.cacheFx.clear();
+                clearTimeout(this.cacheTimer)
             });
         }, 0)
     }
     triggerEffect(
         effect: IStoreMapper, e: onTriggerEventArgs) {
-        var resume = effect !== defaults.current && (effect.binder && !effect.binder.disposed);
+        const resume = effect !== defaults.current && (effect.binder && !effect.binder.disposed);
         if (resume && e.type == 'reset') {
             effect.run();
         } else if (resume) {
@@ -253,7 +271,7 @@ export class Reactive implements IReactive {
                 ProxyMap.delete(x);
             })
         }
-        this._model = [];
+        this._model = null as any;
         this.targetMap = null as unknown as Map<any, any>;
         this.overrides = null as any;
         this.cacheFx = null as any;

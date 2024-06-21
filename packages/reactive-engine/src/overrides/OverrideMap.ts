@@ -7,29 +7,25 @@ export class OverrideMap {
         const unique = Symbol();
         methods.forEach(method => {
 
-            var original = MapType.prototype[method];
-            // var oldDescriptor = Reflect.getOwnPropertyDescriptor(prop, method);
-            // if (oldDescriptor && typeof oldDescriptor.value == 'function') {
-            //     return;
-            // }
+            const original = MapType.prototype[method]; 
             if (hasDescVal(prop, method)) { return; }
             Object.defineProperty(prop, method, {
                 enumerable: true,
                 configurable: true,
                 value: function () {
 
-                    var a = Object.create(arguments);
-                    var i = a.length
-                    var args = new Array(i)
+                    const a = Object.create(arguments);
+                    let i = a.length
+                    const args = new Array(i)
                     while (i--) {
                         args[i] = a[i];
                     }
                     if (args.length > 1 && method == 'set') {
                         args[1] = engine.observe(args[1], parent);
                     }
-                    var result = original.apply(prop, args);
-                    var typeSelect: DataStateTypes = 'update';
-                    var resume = false;
+                    const result = original.apply(prop, args);
+                    let typeSelect: DataStateTypes = 'update';
+                    let resume = false;
                     switch (method) {
                         case 'set':
                             engine.onInsert(engine, {
