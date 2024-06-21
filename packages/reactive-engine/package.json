@@ -1,6 +1,6 @@
 {
     "name": "reactive-engine",
-    "version": "1.0.4",
+    "version": "1.0.6",
     "description": "Javascript Reactive Engine",
     "type": "module",
     "main": "./dist/index.js",
@@ -20,7 +20,20 @@
     "scripts": {
         "build": "rollup -c"
     },
-    "keywords": [],
+    "keywords": [
+        "movijs",
+        "movijsx",
+        "reactivity",
+        "reactive-engine",
+        "store",
+        "state",
+        "management",
+        "typed",
+        "typescript",
+        "ts",
+        "type",
+        "safe"
+    ],
     "author": "Ekrem Erşahin",
     "license": "MIT",
     "types": "./dist/index.d.ts",
