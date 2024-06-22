@@ -11,7 +11,7 @@ export class Proxyable {
         this.createGetter = this.createGetter.bind(this);
         this.createSetter = this.createSetter.bind(this);
         this.ProxyHandler = this.ProxyHandler.bind(this);
-        this.Generate = this.Generate.bind(this); 
+        this.Generate = this.Generate.bind(this);
     }
     private setHandler(target, p, engine: IReactive, parent) {
 
@@ -106,9 +106,9 @@ export class Proxyable {
                         unique: Symbol()
                     });
 
-                    if (!isNumericKey(p)) {
-                        console.error('remove Property', p, isNumericKey(p))
-                    }
+                    // if (!isNumericKey(p)) {
+                    //     console.error('remove Property', p, isNumericKey(p))
+                    // }
                 }
                 return Reflect.deleteProperty(target, p);
             }

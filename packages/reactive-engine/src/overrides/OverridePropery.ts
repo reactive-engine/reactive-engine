@@ -13,7 +13,7 @@ export class OverridePropery {
             return;
         }
         const unique = Symbol();
-        let originalValue = engine.observe(prop[name], { data: prop, key: name });
+        let originalValue = engine.observe(prop[name], { data: prop, key: name }); 
         Reflect.defineProperty(prop, name, {
             get() {
                 if (oldDescriptor?.get) {

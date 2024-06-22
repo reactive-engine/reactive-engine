@@ -78,7 +78,7 @@ export interface IReactive extends IReactiveBase {
     watch(callback: () => void);
     watch<DT, KT extends keyof DT>(prop: DT, key: KT, callback: (data: DT[KT] extends (infer U)[] ? U : DT[KT] extends (infer U) ? U : any) => void): void
     options: IReactiveBase | null;
-    targetMap: Map<any, Map<any, Set<any>>>;
+    targetMap: WeakMap<any, WeakMap<any, Set<any>>>;
     ReactiveState: ReactiveStates;
     stoptrigger: boolean;
     overrides: {

@@ -28,7 +28,7 @@ export class Reactive implements IReactive {
         this.trackComplete = this.trackComplete.bind(this);
         this.clearModel = this.clearModel.bind(this);
         this.clearModelAll = this.clearModelAll.bind(this);
-        this.dispose = this.dispose.bind(this); 
+        this.dispose = this.dispose.bind(this);
     }
 
     watch(callback: () => void);
@@ -53,6 +53,7 @@ export class Reactive implements IReactive {
         if (typeof this.options?.onReset == 'function') {
             typeof this.options.onReset(sender, e);
         }
+        debugger;
     }
     onDelete(sender: IReactive, e: deletedEventArgs) {
         if (typeof this.options?.onDelete == 'function') {
@@ -72,7 +73,7 @@ export class Reactive implements IReactive {
     }
     disposed: boolean = false;
     options: IReactiveBase | null = null;
-    targetMap = new Map<any, Map<any, Set<any>>>();
+    targetMap = new WeakMap<any, WeakMap<any, Set<any>>>;
     ReactiveState: ReactiveStates = 'notset';
     stoptrigger: boolean = false;
     public overrides = {
@@ -81,7 +82,6 @@ export class Reactive implements IReactive {
         map: new OverrideMap(),
         set: new OverrideSet(),
     }
-    private _model: any[] = [];
     observe<T extends object>(data: T, parent?: any): T {
         const t = this;
         if (t.disposed) {
@@ -96,8 +96,8 @@ export class Reactive implements IReactive {
         } else if (t.ReactiveState == 'notset') {
             t.ReactiveState = 'root';
         }
-        const l = t._model.push(defaultProxyable.Generate<T>(data, t, parent));
-        return t._model[l - 1];
+        //const l = t._model.push(defaultProxyable.Generate<T>(data, t, parent));
+        return defaultProxyable.Generate<T>(data, t, parent);//t._model[l - 1];
     }
     onChanged(sender: IReactive, e: onChangedEventArgs) {
 
@@ -106,6 +106,7 @@ export class Reactive implements IReactive {
         e.next();
     }
     onTrigger(sender: IReactive, e: onTriggerEventArgs) {
+
         if (this.disposed) { return; }
         const effects: IStoreMapper[] = [];
         const items = this.targetMap.get(e.prop)?.get(e.key);
@@ -113,10 +114,8 @@ export class Reactive implements IReactive {
         if (exist) {
             if (Array.isArray(e.prop)) {
                 if (exist) {
-                    exist.forEach(x => {
-                        x.forEach(t => {
-                            if (!this.cacheFx.has(t)) effects.push(t)
-                        })
+                    exist.get(e.key)?.forEach(x => {
+                        if (!this.cacheFx.has(x)) effects.push(x)
                     })
                 }
             }
@@ -133,21 +132,21 @@ export class Reactive implements IReactive {
     cacheFx = new Map<IStoreMapper, Set<any>>();
     cacheTimer = null as any;
 
-    adddepends = (de,e) => {
+    adddepends = (de, e) => {
         [...de.depends].filter(x => !this.cacheFx.has(x)).forEach(depEffect => {
             if (this.cacheFx && !this.cacheFx.has(depEffect)) {
                 this.cacheFx.set(depEffect, e.key as any);
             }
-            this.adddepends(depEffect,e);
+            this.adddepends(depEffect, e);
         })
     }
 
     triggerEffects(dep: IStoreMapper[], e: onTriggerEventArgs) {
         const effects = Array.isArray(dep) ? dep : [...dep]
-        for (const effect of effects) { 
+        for (const effect of effects) {
             if (!this.cacheFx.has(effect)) {
-                this.cacheFx.set(effect, e.key as any); 
-                this.adddepends(effect,e);
+                this.cacheFx.set(effect, e.key as any);
+                this.adddepends(effect, e);
             }
         }
         clearTimeout(this.cacheTimer)
@@ -173,6 +172,7 @@ export class Reactive implements IReactive {
         }
     }
     onTrack(sender: IReactive, e: onTrackEventArgs) {
+
         const t = this;
         if (t.disposed) { return; }
         if (defaults.followTracking == undefined) { defaults.followTracking = true };
@@ -211,24 +211,30 @@ export class Reactive implements IReactive {
                     if (t.targetMap.has(toRaw(model[key])) || t.targetMap.has(model[key]) || p.has(model[key]) || p.has(toRaw(model[key]))) {
                         t.clearModel(model[key])
                     }
+                } else if (model[key] && Array.isArray(model[key])) {
+                    model[key].forEach(item => {
+                        this.clearModel(item);
+                    })
                 }
                 p.delete(toRaw(model[key]));
                 p.delete(model[key]);
                 t.targetMap.delete(model[key])
-                t.targetMap.delete(toRaw(model[key]))
+                t.targetMap.delete(toRaw(model[key]));
+                Reflect.deleteProperty(model, key);
             })
             p.delete(toRaw(model));
             p.delete(model);
             t.targetMap.delete(model);
             t.targetMap.delete(toRaw(model));
+            ProxyMap.delete(toRaw(model));
         }
 
     }
-
     clearModelAll(model: any) {
 
         const p = ProxyMap;
         if (model != null && model != undefined) {
+
             defaults.engineMaps.forEach(x => {
                 Object.keys(model).forEach((key) => {
                     if (typeof model[key] === 'object') {
@@ -240,15 +246,17 @@ export class Reactive implements IReactive {
                     p.delete(model[key]);
                     x.targetMap.delete(model[key])
                     x.targetMap.delete(toRaw(model[key]));
+                    Reflect.deleteProperty(model, key);
 
                 })
                 p.delete(toRaw(model));
                 p.delete(model);
                 x.targetMap.delete(model);
                 x.targetMap.delete(toRaw(model));
-                if (x.targetMap.size == 0) {
-                    defaults.engineMaps.delete(x);
-                }
+                ProxyMap.delete(toRaw(model));
+                // if (x.targetMap.size == 0) {
+                //     defaults.engineMaps.delete(x);
+                // }
                 // Object.keys(model).forEach((key) => {
                 //     var tm = x.targetMap.get(toRaw(model[key]));
                 //     if (!tm || tm.size == 0) {
@@ -262,36 +270,11 @@ export class Reactive implements IReactive {
         }
     }
     dispose() {
-        this._model.forEach(x => {
-            this.clearModel(x);
-        })
+
         defaults.engineMaps.delete(this);
-        if (this.ReactiveState == 'root') {
-            this._model.forEach(x => {
-                ProxyMap.delete(x);
-            })
-        }
-        this._model = null as any;
         this.targetMap = null as unknown as Map<any, any>;
         this.overrides = null as any;
         this.cacheFx = null as any;
         this.disposed = true;
-        defaults.engineMaps.forEach(x => {
-            if (x.targetMap.size == 0) {
-                defaults.engineMaps.delete(x);
-            }
-        });
-        // Promise.resolve().then(() => {
-        //     defaults.engineMaps.forEach(x => {
-        //         x['_model'] && x['_model'].forEach(m => {
-        //             var tm = x.targetMap.get(toRaw(m));
-        //             if (!tm || tm.size == 0) {
-        //                 defaults.engineMaps.delete(x);
-        //             } else {
-        //                 x.targetMap.delete(toRaw(m));
-        //             }
-        //         })
-        //     })
-        // })
     }
 }

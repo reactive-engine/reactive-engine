@@ -1,6 +1,7 @@
 import { Reactive } from "reactive-engine";
 import { bindElement } from "./BasicBinding";
 import { bindModel } from "./TwoWayModelBinding";
+ 
 var reactive = new Reactive();
 let model = reactive.observe({
     intValue: 1,

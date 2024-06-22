@@ -44,7 +44,6 @@ export class IStoreBindingSettings<OwnerType extends object> {
         set: (value) => void
     }
     public owner: OwnerType = null as any;
-    references: { prop: object, key: any }[] = [];
 }
 
 export interface IStoreBinder<OwnerType extends object> {
@@ -80,7 +79,6 @@ export class DefaultStoreBindingSettings<OwnerType extends object> implements IS
     public FieldName!: string;
     public callback!: () => any;
     public type!: DirectiveBindingType;
-    public references: { prop: object, key: any }[] = [];
 }
 
 export class DefaultStoreMapper implements IStoreMapper {
@@ -113,37 +111,6 @@ export class DefaultStoreMapper implements IStoreMapper {
         if (!this) {
             return;
         }
-        defaults.engineMaps.forEach(em => {
-
-            this.binder?.settings?.references?.forEach(ref => {
-                if (em.targetMap.get(ref.prop)?.has(ref.key)) {
-                    em.targetMap.get(ref.prop)?.get(ref.key)?.delete(this);
-                    if (em.targetMap.get(ref.prop)?.get(ref.key)?.size == 0) {
-                        em.targetMap.get(ref.prop)?.delete(ref.key)
-                    }
-                }
-                if (em.targetMap.get(ref.prop)?.get(ref.key)?.size == 0) {
-                    em.targetMap.get(ref.prop)?.delete(ref.key)
-                }
-                if (em.targetMap.get(ref.prop)?.size == 0) {
-                    em.targetMap.delete(ref.prop)
-                }
-            })
-
-            const existModels = em.targetMap.get(this.binder.settings?.Property);
-            if (existModels && existModels.has(this.binder.settings?.FieldName)) {
-                existModels.get(this.binder.settings?.FieldName)?.delete(this);
-                if (existModels.get(this.binder.settings?.FieldName)?.size == 0) {
-                    existModels.delete(this.binder.settings.FieldName)
-                }
-            }
-            if (em.targetMap.get(this.binder.settings?.Property)?.get(this.binder.settings.FieldName)?.size == 0) {
-                em.targetMap.get(this.binder.settings?.Property)?.delete(this.binder.settings.FieldName)
-            }
-            if (em.targetMap.get(this.binder.settings?.Property)?.size == 0) {
-                em.targetMap.delete(this.binder.settings?.Property)
-            }
-        })
         this.disposed = true;
         this.parents.delete(this);
         this.parents = null as any;
@@ -189,7 +156,6 @@ export class EffectStoreBinder implements IStoreBinder<any> {
         if (t.settings) {
             t.settings.FieldName = key;
             t.settings.Property = target;
-            t.settings.references.push({ key: key, prop: target })
         }
     }
     dispose(): void {
